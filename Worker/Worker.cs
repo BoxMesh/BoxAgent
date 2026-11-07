@@ -1,4 +1,4 @@
-namespace EdgeAgent;
+namespace BoxAgent.Worker;
 
 public class Worker(ILogger<Worker> logger) : BackgroundService
 {

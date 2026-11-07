@@ -1,4 +1,4 @@
-using EdgeAgent;
+using BoxAgent.Worker;
 
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddHostedService<Worker>();

@@ -37,11 +37,13 @@ type DeviceRequest struct {
 	Uptime         int64                  `protobuf:"varint,11,opt,name=uptime,proto3" json:"uptime,omitempty"`
 	AgentVersion   string                 `protobuf:"bytes,12,opt,name=agent_version,json=agentVersion,proto3" json:"agent_version,omitempty"`
 	// Usage in percent; network in Mbps since the agent's previous report.
-	CpuUsage      float64 `protobuf:"fixed64,13,opt,name=cpu_usage,json=cpuUsage,proto3" json:"cpu_usage,omitempty"`
-	RamUsage      float64 `protobuf:"fixed64,14,opt,name=ram_usage,json=ramUsage,proto3" json:"ram_usage,omitempty"`
-	DiskUsage     float64 `protobuf:"fixed64,15,opt,name=disk_usage,json=diskUsage,proto3" json:"disk_usage,omitempty"`
-	NetIn         float64 `protobuf:"fixed64,16,opt,name=net_in,json=netIn,proto3" json:"net_in,omitempty"`
-	NetOut        float64 `protobuf:"fixed64,17,opt,name=net_out,json=netOut,proto3" json:"net_out,omitempty"`
+	CpuUsage  float64 `protobuf:"fixed64,13,opt,name=cpu_usage,json=cpuUsage,proto3" json:"cpu_usage,omitempty"`
+	RamUsage  float64 `protobuf:"fixed64,14,opt,name=ram_usage,json=ramUsage,proto3" json:"ram_usage,omitempty"`
+	DiskUsage float64 `protobuf:"fixed64,15,opt,name=disk_usage,json=diskUsage,proto3" json:"disk_usage,omitempty"`
+	NetIn     float64 `protobuf:"fixed64,16,opt,name=net_in,json=netIn,proto3" json:"net_in,omitempty"`
+	NetOut    float64 `protobuf:"fixed64,17,opt,name=net_out,json=netOut,proto3" json:"net_out,omitempty"`
+	// The busiest processes now, busiest first.
+	Processes     []*DeviceProcess `protobuf:"bytes,18,rep,name=processes,proto3" json:"processes,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -195,6 +197,99 @@ func (x *DeviceRequest) GetNetOut() float64 {
 	return 0
 }
 
+func (x *DeviceRequest) GetProcesses() []*DeviceProcess {
+	if x != nil {
+		return x.Processes
+	}
+	return nil
+}
+
+type DeviceProcess struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Pid   int32                  `protobuf:"varint,1,opt,name=pid,proto3" json:"pid,omitempty"`
+	Name  string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	User  string                 `protobuf:"bytes,3,opt,name=user,proto3" json:"user,omitempty"`
+	// running, suspended or not-responding
+	Status string `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
+	// Percent of the whole machine.
+	Cpu           float64 `protobuf:"fixed64,5,opt,name=cpu,proto3" json:"cpu,omitempty"`
+	MemoryMb      float64 `protobuf:"fixed64,6,opt,name=memory_mb,json=memoryMb,proto3" json:"memory_mb,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeviceProcess) Reset() {
+	*x = DeviceProcess{}
+	mi := &file_proto_device_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeviceProcess) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeviceProcess) ProtoMessage() {}
+
+func (x *DeviceProcess) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_device_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeviceProcess.ProtoReflect.Descriptor instead.
+func (*DeviceProcess) Descriptor() ([]byte, []int) {
+	return file_proto_device_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *DeviceProcess) GetPid() int32 {
+	if x != nil {
+		return x.Pid
+	}
+	return 0
+}
+
+func (x *DeviceProcess) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *DeviceProcess) GetUser() string {
+	if x != nil {
+		return x.User
+	}
+	return ""
+}
+
+func (x *DeviceProcess) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *DeviceProcess) GetCpu() float64 {
+	if x != nil {
+		return x.Cpu
+	}
+	return 0
+}
+
+func (x *DeviceProcess) GetMemoryMb() float64 {
+	if x != nil {
+		return x.MemoryMb
+	}
+	return 0
+}
+
 type DeviceResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Data          *anypb.Any             `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
@@ -204,7 +299,7 @@ type DeviceResponse struct {
 
 func (x *DeviceResponse) Reset() {
 	*x = DeviceResponse{}
-	mi := &file_proto_device_proto_msgTypes[1]
+	mi := &file_proto_device_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -216,7 +311,7 @@ func (x *DeviceResponse) String() string {
 func (*DeviceResponse) ProtoMessage() {}
 
 func (x *DeviceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_device_proto_msgTypes[1]
+	mi := &file_proto_device_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -229,7 +324,7 @@ func (x *DeviceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeviceResponse.ProtoReflect.Descriptor instead.
 func (*DeviceResponse) Descriptor() ([]byte, []int) {
-	return file_proto_device_proto_rawDescGZIP(), []int{1}
+	return file_proto_device_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *DeviceResponse) GetData() *anypb.Any {
@@ -243,7 +338,7 @@ var File_proto_device_proto protoreflect.FileDescriptor
 
 const file_proto_device_proto_rawDesc = "" +
 	"\n" +
-	"\x12proto/device.proto\x12\x06device\x1a\x19google/protobuf/any.proto\"\xdb\x03\n" +
+	"\x12proto/device.proto\x12\x06device\x1a\x19google/protobuf/any.proto\"\x90\x04\n" +
 	"\rDeviceRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
 	"\thost_name\x18\x02 \x01(\tR\bhostName\x12\x17\n" +
@@ -266,7 +361,15 @@ const file_proto_device_proto_rawDesc = "" +
 	"\n" +
 	"disk_usage\x18\x0f \x01(\x01R\tdiskUsage\x12\x15\n" +
 	"\x06net_in\x18\x10 \x01(\x01R\x05netIn\x12\x17\n" +
-	"\anet_out\x18\x11 \x01(\x01R\x06netOut\":\n" +
+	"\anet_out\x18\x11 \x01(\x01R\x06netOut\x123\n" +
+	"\tprocesses\x18\x12 \x03(\v2\x15.device.DeviceProcessR\tprocesses\"\x90\x01\n" +
+	"\rDeviceProcess\x12\x10\n" +
+	"\x03pid\x18\x01 \x01(\x05R\x03pid\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
+	"\x04user\x18\x03 \x01(\tR\x04user\x12\x16\n" +
+	"\x06status\x18\x04 \x01(\tR\x06status\x12\x10\n" +
+	"\x03cpu\x18\x05 \x01(\x01R\x03cpu\x12\x1b\n" +
+	"\tmemory_mb\x18\x06 \x01(\x01R\bmemoryMb\":\n" +
 	"\x0eDeviceResponse\x12(\n" +
 	"\x04data\x18\x01 \x01(\v2\x14.google.protobuf.AnyR\x04data2C\n" +
 	"\n" +
@@ -285,21 +388,23 @@ func file_proto_device_proto_rawDescGZIP() []byte {
 	return file_proto_device_proto_rawDescData
 }
 
-var file_proto_device_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_proto_device_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_proto_device_proto_goTypes = []any{
 	(*DeviceRequest)(nil),  // 0: device.DeviceRequest
-	(*DeviceResponse)(nil), // 1: device.DeviceResponse
-	(*anypb.Any)(nil),      // 2: google.protobuf.Any
+	(*DeviceProcess)(nil),  // 1: device.DeviceProcess
+	(*DeviceResponse)(nil), // 2: device.DeviceResponse
+	(*anypb.Any)(nil),      // 3: google.protobuf.Any
 }
 var file_proto_device_proto_depIdxs = []int32{
-	2, // 0: device.DeviceResponse.data:type_name -> google.protobuf.Any
-	0, // 1: device.DeviceGRPC.Ping:input_type -> device.DeviceRequest
-	1, // 2: device.DeviceGRPC.Ping:output_type -> device.DeviceResponse
-	2, // [2:3] is the sub-list for method output_type
-	1, // [1:2] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	1, // 0: device.DeviceRequest.processes:type_name -> device.DeviceProcess
+	3, // 1: device.DeviceResponse.data:type_name -> google.protobuf.Any
+	0, // 2: device.DeviceGRPC.Ping:input_type -> device.DeviceRequest
+	2, // 3: device.DeviceGRPC.Ping:output_type -> device.DeviceResponse
+	3, // [3:4] is the sub-list for method output_type
+	2, // [2:3] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_proto_device_proto_init() }
@@ -313,7 +418,7 @@ func file_proto_device_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_device_proto_rawDesc), len(file_proto_device_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

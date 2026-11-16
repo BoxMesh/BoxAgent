@@ -22,11 +22,20 @@ func TestRequestCarriesTheSnapshot(t *testing.T) {
 		Host: "debian-1", OS: "debian", OSVersion: "13.1", OSArchitecture: "x86_64", AgentVersion: "v0.1.3",
 		Hardware: metrics.Hardware{CPU: "Test CPU", RAMBytes: 512, DiskBytes: 1024, UptimeSeconds: 60},
 		CPU:      12.5, RAM: 40, Disk: 3.2, NetIn: 1.5, NetOut: 0.25,
+		Processes: []metrics.Process{
+			{PID: 42, Name: "yes", User: "vagrant", Status: "running", CPU: 97.5, MemoryMB: 1.9},
+		},
 	}
 	r := request("id-1", s, "192.168.56.11", "08:00:27:28:cb:85")
 	if r.Id != "id-1" || r.HostName != "debian-1" || r.IpAddress != "192.168.56.11" || r.MacAddress != "08:00:27:28:cb:85" ||
 		r.Ram != 512 || r.Disk != 1024 || r.Uptime != 60 || r.AgentVersion != "v0.1.3" ||
 		r.CpuUsage != 12.5 || r.RamUsage != 40 || r.DiskUsage != 3.2 || r.NetIn != 1.5 || r.NetOut != 0.25 {
 		t.Fatalf("request lost a field: %v", r)
+	}
+	if len(r.Processes) != 1 {
+		t.Fatalf("got %d processes, want 1", len(r.Processes))
+	}
+	if p := r.Processes[0]; p.Pid != 42 || p.Name != "yes" || p.User != "vagrant" || p.Status != "running" || p.Cpu != 97.5 || p.MemoryMb != 1.9 {
+		t.Fatalf("process lost a field: %v", p)
 	}
 }

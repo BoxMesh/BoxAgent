@@ -1,9 +1,11 @@
 #!/bin/sh
-# Installs /tmp/boxagent as a systemd service that starts on boot. Run as root by `make deploy`.
+# Installs /tmp/boxagent as a systemd service that starts on boot and reports to the BoxServer given as $1
+# (host:port of its gRPC port). Run as root by `make deploy`.
 set -eu
 
+SERVER=${1:?usage: install.sh <boxserver host:port>}
 install -m 0755 /tmp/boxagent /usr/local/bin/boxagent
-# shortcut: no log rotation (~15 MB/day), drop when the agent ships metrics to BoxServer instead of the log.
+# Holds only start-up lines and errors: samples go to BoxServer.
 LOG=/var/log/boxagent.log
 
 cat > /etc/systemd/system/boxagent.service <<EOF
@@ -13,7 +15,7 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-ExecStart=/usr/local/bin/boxagent
+ExecStart=/usr/local/bin/boxagent -server $SERVER
 Restart=always
 StandardOutput=append:$LOG
 StandardError=append:$LOG

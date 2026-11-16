@@ -21,7 +21,9 @@ Vagrant.configure("2") do |config|
   # Install or update the agent with `make deploy`; `vagrant up` alone never runs these.
   config.vm.provision "agent-bin", type: "file", run: "never", source: "dist/boxagent", destination: "/tmp/boxagent"
   config.vm.provision "agent-install", type: "file", run: "never", source: "deploy/install.sh", destination: "/tmp/install.sh"
-  config.vm.provision "agent", type: "shell", run: "never", inline: "sh /tmp/install.sh"
+  # The VMs reach the Windows host, where BoxServer runs, at its host-only address.
+  server = ENV.fetch("BOXSERVER", "192.168.56.1:8081")
+  config.vm.provision "agent", type: "shell", run: "never", inline: "sh /tmp/install.sh #{server}"
 
   distros.product((1..n).to_a).each_with_index do |(distro, i), idx|
     name = "#{distro}-#{i}"

@@ -10,8 +10,12 @@ build:
 test:
 	go test ./...
 
+# Regenerate internal/pb after editing proto/device.proto (needs protoc, protoc-gen-go and protoc-gen-go-grpc).
+proto:
+	protoc --go_out=. --go_opt=module=boxagent --go-grpc_out=. --go-grpc_opt=module=boxagent proto/device.proto
+
 # Install or update the agent on every running VM.
 deploy: build
 	vagrant provision --provision-with agent-bin,agent-install,agent
 
-.PHONY: build test deploy
+.PHONY: build test proto deploy

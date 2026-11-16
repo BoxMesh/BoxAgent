@@ -1,4 +1,5 @@
-VERSION ?= $(or $(shell git describe --tags --always --dirty),dev)
+# Numeric like the releases (0.1.<n>): local builds count commits, CI uses the run number.
+VERSION ?= 0.1.$(shell git rev-list --count HEAD)
 
 # Static Linux binary for the Vagrant VMs (runs on musl and glibc alike).
 build: export GOOS=linux

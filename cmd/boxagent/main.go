@@ -20,7 +20,7 @@ import (
 )
 
 // Set at build time: -ldflags "-X main.version=..."
-var version = "dev"
+var version = "0.0.0"
 
 func main() {
 	interval := flag.Duration("interval", 10*time.Second, "time between samples")

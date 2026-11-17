@@ -21,7 +21,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "agent-bin", type: "file", run: "never", source: "dist/boxagent", destination: "/tmp/boxagent"
   server = ENV.fetch("BOXSERVER", "192.168.56.1:8081")
-  config.vm.provision "agent", type: "shell", run: "never", inline: "install -m 0755 /tmp/boxagent /usr/local/bin/boxagent; pkill -x boxagent; nohup boxagent --server #{server} >>/var/log/boxagent.log 2>&1 </dev/null &"
+  config.vm.provision "agent", type: "shell", run: "never", inline: "install -m 0755 /tmp/boxagent /usr/local/bin/boxagent; pkill -x boxagent; nohup /usr/local/bin/boxagent --server #{server} >>/var/log/boxagent.log 2>&1 </dev/null &"
 
   distros.product((1..n).to_a).each_with_index do |(distro, i), idx|
     name = "#{distro}-#{i}"

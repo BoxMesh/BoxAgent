@@ -8,7 +8,7 @@ import (
 
 // Runs against the real machine the tests run on.
 func TestCollectOnThisMachine(t *testing.T) {
-	c := NewCollector(5, "test")
+	c := NewCollector("test")
 	ctx := context.Background()
 	if _, err := c.Collect(ctx); err != nil {
 		t.Fatal(err)
@@ -32,8 +32,8 @@ func TestCollectOnThisMachine(t *testing.T) {
 	if s.NetIn < 0 || s.NetOut < 0 {
 		t.Errorf("net = %v / %v, want >= 0", s.NetIn, s.NetOut)
 	}
-	if len(s.Processes) == 0 || len(s.Processes) > 5 {
-		t.Errorf("got %d processes, want 1..5", len(s.Processes))
+	if len(s.Processes) == 0 {
+		t.Error("no processes reported")
 	}
 	for _, p := range s.Processes {
 		if p.CPU < 0 || p.CPU > 100 {

@@ -8,8 +8,9 @@ n = Integer(ENV.fetch("N", "1"))
 distros = ENV.fetch("DISTROS", "debian,ubuntu,rocky").split(",").map(&:strip)
 
 Vagrant.configure("2") do |config|
+  # Vagrant on Windows misdetects the host architecture and then cannot find the amd64 boxes.
+  config.vm.box_architecture = "amd64"
   config.vm.synced_folder ".", "/vagrant", disabled: true
-  # With Hyper-V on, VirtualBox runs through it (NEM) and boots slowly; the 300s default is too tight.
   config.vm.boot_timeout = 600
 
   config.vm.provider "virtualbox" do |vb|
@@ -18,12 +19,9 @@ Vagrant.configure("2") do |config|
     vb.linked_clone = true
   end
 
-  # Install or update the agent with `make deploy`; `vagrant up` alone never runs these.
   config.vm.provision "agent-bin", type: "file", run: "never", source: "dist/boxagent", destination: "/tmp/boxagent"
-  config.vm.provision "agent-install", type: "file", run: "never", source: "deploy/install.sh", destination: "/tmp/install.sh"
-  # The VMs reach the Windows host, where BoxServer runs, at its host-only address.
   server = ENV.fetch("BOXSERVER", "192.168.56.1:8081")
-  config.vm.provision "agent", type: "shell", run: "never", inline: "sh /tmp/install.sh #{server}"
+  config.vm.provision "agent", type: "shell", run: "never", inline: "install -m 0755 /tmp/boxagent /usr/local/bin/boxagent; pkill -x boxagent; nohup boxagent --server #{server} >>/var/log/boxagent.log 2>&1 </dev/null &"
 
   distros.product((1..n).to_a).each_with_index do |(distro, i), idx|
     name = "#{distro}-#{i}"

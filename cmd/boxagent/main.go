@@ -1,11 +1,9 @@
-// BoxAgent samples this machine's metrics and reports each sample to BoxServer over gRPC. Without -server it
-// prints one JSON line per sample to stdout instead.
+// BoxAgent samples this machine's metrics and reports each sample to BoxServer over gRPC.
 package main
 
 import (
 	"context"
-	"encoding/json"
-	"flag"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -17,58 +15,69 @@ import (
 	"boxagent/internal/identity"
 	"boxagent/internal/metrics"
 	"boxagent/internal/report"
+
+	"github.com/spf13/cobra"
 )
 
 // Set at build time: -ldflags "-X main.version=..."
 var version = "0.0.0"
 
 func main() {
-	interval := flag.Duration("interval", 10*time.Second, "time between samples")
-	top := flag.Int("top", 10, "number of processes to report, busiest first")
-	server := flag.String("server", "", "BoxServer gRPC address, host:port; empty keeps samples local")
-	idFile := flag.String("id-file", defaultIDFile(), "file that keeps this machine's device ID")
-	flag.Parse()
+	var server string
+	var interval time.Duration
+	cmd := &cobra.Command{
+		Use:           "boxagent",
+		Short:         "Report this machine's metrics to BoxServer",
+		Version:       version,
+		SilenceUsage:  true,
+		SilenceErrors: true,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			return run(cmd.Context(), server, interval)
+		},
+	}
+	cmd.Flags().StringVarP(&server, "server", "s", "", "BoxServer gRPC address, host:port, e.g. 192.168.1.10:8081")
+	cmd.Flags().DurationVarP(&interval, "interval", "i", 10*time.Second, "time between samples")
+	cmd.MarkFlagRequired("server")
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
-
-	var reporter *report.Client
-	if *server != "" {
-		id, err := identity.LoadOrCreate(*idFile)
-		if err != nil {
-			log.Fatalf("device id: %v", err)
-		}
-		if reporter, err = report.Dial(*server, id); err != nil {
-			log.Fatalf("server %s: %v", *server, err)
-		}
-		defer reporter.Close()
-		log.Printf("reporting to %s as device %s", *server, id)
+	if err := cmd.ExecuteContext(ctx); err != nil {
+		fmt.Fprintln(os.Stderr, "boxagent:", err)
+		os.Exit(1)
 	}
+}
 
-	c := metrics.NewCollector(*top, version)
-	out := json.NewEncoder(os.Stdout)
-	tick := time.NewTicker(*interval)
+func run(ctx context.Context, server string, interval time.Duration) error {
+	id, err := identity.LoadOrCreate(idFile())
+	if err != nil {
+		return fmt.Errorf("device id: %w", err)
+	}
+	reporter, err := report.Dial(server, id)
+	if err != nil {
+		return fmt.Errorf("server %s: %w", server, err)
+	}
+	defer reporter.Close()
+	log.Printf("reporting to %s as device %s", server, id)
+
+	c := metrics.NewCollector(version)
+	tick := time.NewTicker(interval)
 	defer tick.Stop()
 	for {
 		if s, err := c.Collect(ctx); err != nil {
 			log.Printf("collect: %v", err)
-		} else if reporter != nil {
+		} else if err := reporter.Send(ctx, s); err != nil {
 			// A failed report is logged and dropped; the next sample tries again.
-			if err := reporter.Send(ctx, s); err != nil {
-				log.Printf("report: %v", err)
-			}
-		} else if err := out.Encode(s); err != nil {
-			log.Printf("write: %v", err)
+			log.Printf("report: %v", err)
 		}
 		select {
 		case <-ctx.Done():
-			return
+			return nil
 		case <-tick.C:
 		}
 	}
 }
 
-func defaultIDFile() string {
+func idFile() string {
 	if runtime.GOOS == "windows" {
 		return filepath.Join(os.Getenv("ProgramData"), "BoxAgent", "id")
 	}

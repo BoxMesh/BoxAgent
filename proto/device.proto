@@ -27,7 +27,7 @@ message DeviceRequest {
     double disk_usage = 15;
     double net_in = 16;
     double net_out = 17;
-    // The busiest processes now, busiest first.
+    // Every process now, busiest first.
     repeated DeviceProcess processes = 18;
 }
 

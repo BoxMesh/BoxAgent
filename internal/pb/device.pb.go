@@ -42,7 +42,7 @@ type DeviceRequest struct {
 	DiskUsage float64 `protobuf:"fixed64,15,opt,name=disk_usage,json=diskUsage,proto3" json:"disk_usage,omitempty"`
 	NetIn     float64 `protobuf:"fixed64,16,opt,name=net_in,json=netIn,proto3" json:"net_in,omitempty"`
 	NetOut    float64 `protobuf:"fixed64,17,opt,name=net_out,json=netOut,proto3" json:"net_out,omitempty"`
-	// The busiest processes now, busiest first.
+	// Every process now, busiest first.
 	Processes     []*DeviceProcess `protobuf:"bytes,18,rep,name=processes,proto3" json:"processes,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

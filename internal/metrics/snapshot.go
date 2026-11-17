@@ -1,4 +1,4 @@
-// Package metrics samples a machine's identity, usage and busiest processes.
+// Package metrics samples a machine's identity, usage and processes.
 package metrics
 
 import "time"

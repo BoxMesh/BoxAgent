@@ -8,7 +8,7 @@ import (
 	"github.com/shirou/gopsutil/v4/process"
 )
 
-// processes returns the busiest processes. A process keeps its object across samples so Percent(0) can
+// processes returns every process, busiest first. A process keeps its object across samples so Percent(0) can
 // measure since the last sample; on the first sample every process reads 0.
 func (c *Collector) processes(ctx context.Context) []Process {
 	pids, err := process.PidsWithContext(ctx)
@@ -50,9 +50,6 @@ func (c *Collector) processes(ctx context.Context) []Process {
 		}
 		return list[i].MemoryMB > list[j].MemoryMB
 	})
-	if len(list) > c.top {
-		list = list[:c.top]
-	}
 	return list
 }
 

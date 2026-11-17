@@ -17,7 +17,6 @@ import (
 // Collector keeps what rates need between samples: network counters and per-process CPU times.
 // Not safe for concurrent use.
 type Collector struct {
-	top          int
 	agentVersion string
 	diskMount    string
 	cpuModel     string
@@ -25,13 +24,13 @@ type Collector struct {
 	procs        map[int32]*process.Process
 }
 
-// NewCollector reports the top busiest processes and tags every snapshot with agentVersion.
-func NewCollector(top int, agentVersion string) *Collector {
+// NewCollector reports every process and tags every snapshot with agentVersion.
+func NewCollector(agentVersion string) *Collector {
 	mount := "/"
 	if runtime.GOOS == "windows" {
 		mount = `C:\`
 	}
-	return &Collector{top: top, agentVersion: agentVersion, diskMount: mount, procs: map[int32]*process.Process{}}
+	return &Collector{agentVersion: agentVersion, diskMount: mount, procs: map[int32]*process.Process{}}
 }
 
 // Collect takes one sample. Rates (CPU, network, per-process CPU) cover the time since the previous call;

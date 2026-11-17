@@ -17,6 +17,6 @@ proto:
 
 # Install or update the agent on every running VM.
 deploy: build
-	vagrant provision --provision-with agent-bin,agent-install,agent
+	vagrant provision --provision-with agent-bin,agent
 
 .PHONY: build test proto deploy

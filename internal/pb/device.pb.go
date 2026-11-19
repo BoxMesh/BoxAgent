@@ -374,7 +374,7 @@ const file_proto_device_proto_rawDesc = "" +
 	"\x04data\x18\x01 \x01(\v2\x14.google.protobuf.AnyR\x04data2C\n" +
 	"\n" +
 	"DeviceGRPC\x125\n" +
-	"\x04Ping\x12\x15.device.DeviceRequest\x1a\x16.device.DeviceResponseB+Z\x14boxagent/internal/pb\xaa\x02\x12BoxServer.API.GRPCb\x06proto3"
+	"\x04Ping\x12\x15.device.DeviceRequest\x1a\x16.device.DeviceResponseB%Z\x14boxagent/internal/pb\xaa\x02\x0cZin.API.GRPCb\x06proto3"
 
 var (
 	file_proto_device_proto_rawDescOnce sync.Once

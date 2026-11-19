@@ -2,8 +2,8 @@ syntax = "proto3";
 
 import "google/protobuf/any.proto";
 
-option csharp_namespace = "BoxServer.API.GRPC";
-// Kept identical to BoxServer/src/BoxServer.API/Protos/Device.proto; change both together.
+option csharp_namespace = "Zin.API.GRPC";
+// Kept identical to OctopusServer/src/Zin.API/Protos/Device.proto; change both together.
 option go_package = "boxagent/internal/pb";
 
 package device;

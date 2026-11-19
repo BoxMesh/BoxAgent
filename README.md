@@ -1,10 +1,10 @@
 # BoxAgent
 
 BoxAgent chạy trên từng máy được quản lý. Cứ vài giây nó đo máy một lần và báo số liệu về **BoxServer** qua gRPC.
-BoxMesh, web console, hiển thị những gì BoxServer đã lưu.
+Zin, web console, hiển thị những gì BoxServer đã lưu.
 
 ```text
-BoxAgent (mỗi máy) ──gRPC, chỉ gọi ra ngoài──► BoxServer ◄──HTTPS── BoxMesh (trình duyệt)
+BoxAgent (mỗi máy) ──gRPC, chỉ gọi ra ngoài──► BoxServer ◄──HTTPS── Zin (trình duyệt)
 ```
 
 Agent chỉ gọi ra (dial-out). Máy không cần public IP, không cần mở inbound port, không cần VPN; chỉ cần đường tới cổng
@@ -115,7 +115,7 @@ rồi bỏ; mẫu sau thử lại, và gRPC tự nối lại. Việc lấy mẫu
 | `processes` | repeated | `pid`, `name`, `user`, `status`, `cpu` (%), `memory_mb` |
 
 Định nghĩa nằm ở [proto/device.proto](proto/device.proto). File này phải giống hệt
-`BoxServer/src/BoxServer.API/Protos/Device.proto`; sửa thì sửa cả hai, rồi chạy `make proto`.
+`OctopusServer/src/Zin.API/Protos/Device.proto`; sửa thì sửa cả hai, rồi chạy `make proto`.
 
 BoxServer từ chối lệnh gọi có `id` không phải UUID hoặc `host_name` rỗng (`INVALID_ARGUMENT`). Còn lại, nó tạo thiết bị
 ở lần gọi đầu và cập nhật ở các lần sau.
@@ -125,12 +125,12 @@ BoxServer từ chối lệnh gọi có `id` không phải UUID hoặc `host_name
 Chưa có gì để agent xử lý. `Ping` trả `true` khi BoxServer đã lưu mẫu, và agent không đọc phản hồi đó. Server hiện chưa
 gửi được cho agent lệnh, truy vấn hay cấu hình nào.
 
-BoxMesh đã có màn hình terminal từ xa, duyệt file và web service, nhưng chúng cần kênh này nên chưa chạy được với
+Zin đã có màn hình terminal từ xa, duyệt file và web service, nhưng chúng cần kênh này nên chưa chạy được với
 BoxServer thật cho tới khi kênh có mặt.
 
 ## Cài đặt
 
-Bản build sẵn nằm ở [trang releases](https://github.com/BoxMesh/BoxAgent/releases). Mỗi lần push vào `main` sẽ phát hành
+Bản build sẵn nằm ở [trang releases](https://github.com/ZinOctopus/exporter/releases). Mỗi lần push vào `main` sẽ phát hành
 một release `v0.1.<n>` gồm:
 
 | File | Dùng cho |
@@ -154,8 +154,8 @@ Test-NetConnection 192.168.1.10 -Port 8081   # Windows PowerShell
 **Chạy thử bằng tay** (dừng khi đóng shell):
 
 ```bash
-curl -LO https://github.com/BoxMesh/BoxAgent/releases/latest/download/boxagent-linux-amd64
-curl -LO https://github.com/BoxMesh/BoxAgent/releases/latest/download/SHA256SUMS
+curl -LO https://github.com/ZinOctopus/exporter/releases/latest/download/boxagent-linux-amd64
+curl -LO https://github.com/ZinOctopus/exporter/releases/latest/download/SHA256SUMS
 sha256sum -c SHA256SUMS --ignore-missing      # phải in OK
 chmod +x boxagent-linux-amd64
 sudo ./boxagent-linux-amd64 --server 192.168.1.10:8081
@@ -204,7 +204,7 @@ Mở PowerShell **bằng quyền Administrator** (agent ghi file ID vào `C:\Pro
 
 ```powershell
 mkdir C:\BoxAgent
-Invoke-WebRequest https://github.com/BoxMesh/BoxAgent/releases/latest/download/boxagent-windows-amd64.exe -OutFile C:\BoxAgent\boxagent.exe
+Invoke-WebRequest https://github.com/ZinOctopus/exporter/releases/latest/download/boxagent-windows-amd64.exe -OutFile C:\BoxAgent\boxagent.exe
 C:\BoxAgent\boxagent.exe --server 192.168.1.10:8081
 ```
 
@@ -223,7 +223,7 @@ Chưa phát hành bản cho macOS. Mã nguồn đã xử lý macOS (OS được 
 build bằng [Go](https://go.dev/dl/) 1.27.3 trở lên:
 
 ```bash
-git clone https://github.com/BoxMesh/BoxAgent.git && cd BoxAgent
+git clone https://github.com/ZinOctopus/exporter.git && cd BoxAgent
 GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -o boxagent ./cmd/boxagent   # Apple silicon; đổi amd64 cho Intel
 sudo ./boxagent --server 192.168.1.10:8081
 ```

@@ -1,4 +1,4 @@
-// BoxAgent samples this machine's metrics and reports each sample to BoxServer over gRPC.
+// ZExporter samples this machine's metrics and reports each sample to BoxServer over gRPC.
 package main
 
 import (
@@ -26,7 +26,7 @@ func main() {
 	var server string
 	var interval time.Duration
 	cmd := &cobra.Command{
-		Use:           "boxagent",
+		Use:           "zexporter",
 		Short:         "Report this machine's metrics to BoxServer",
 		Version:       version,
 		SilenceUsage:  true,
@@ -42,7 +42,7 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	if err := cmd.ExecuteContext(ctx); err != nil {
-		fmt.Fprintln(os.Stderr, "boxagent:", err)
+		fmt.Fprintln(os.Stderr, "zexporter:", err)
 		os.Exit(1)
 	}
 }
@@ -79,7 +79,7 @@ func run(ctx context.Context, server string, interval time.Duration) error {
 
 func idFile() string {
 	if runtime.GOOS == "windows" {
-		return filepath.Join(os.Getenv("ProgramData"), "BoxAgent", "id")
+		return filepath.Join(os.Getenv("ProgramData"), "ZExporter", "id")
 	}
-	return "/var/lib/boxagent/id"
+	return "/var/lib/zexporter/id"
 }

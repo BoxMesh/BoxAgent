@@ -19,9 +19,9 @@ Vagrant.configure("2") do |config|
     vb.linked_clone = true
   end
 
-  config.vm.provision "agent-bin", type: "file", run: "never", source: "dist/boxagent", destination: "/tmp/boxagent"
+  config.vm.provision "agent-bin", type: "file", run: "never", source: "dist/zexporter", destination: "/tmp/zexporter"
   server = ENV.fetch("BOXSERVER", "192.168.56.1:8081")
-  config.vm.provision "agent", type: "shell", run: "never", inline: "install -m 0755 /tmp/boxagent /usr/local/bin/boxagent; pkill -x boxagent; nohup /usr/local/bin/boxagent --server #{server} >>/var/log/boxagent.log 2>&1 </dev/null &"
+  config.vm.provision "agent", type: "shell", run: "never", inline: "install -m 0755 /tmp/zexporter /usr/local/bin/zexporter; pkill -x zexporter; nohup /usr/local/bin/zexporter --server #{server} >>/var/log/zexporter.log 2>&1 </dev/null &"
 
   distros.product((1..n).to_a).each_with_index do |(distro, i), idx|
     name = "#{distro}-#{i}"

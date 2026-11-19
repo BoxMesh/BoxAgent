@@ -6,7 +6,7 @@ build: export GOOS=linux
 build: export GOARCH=amd64
 build: export CGO_ENABLED=0
 build:
-	go build -ldflags "-s -w -X main.version=$(VERSION)" -o dist/boxagent ./cmd/boxagent
+	go build -ldflags "-s -w -X main.version=$(VERSION)" -o dist/zexporter ./cmd/zexporter
 
 test:
 	go test ./...

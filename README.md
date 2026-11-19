@@ -1,10 +1,10 @@
-# BoxAgent
+# ZExporter
 
-BoxAgent chạy trên từng máy được quản lý. Cứ vài giây nó đo máy một lần và báo số liệu về **BoxServer** qua gRPC.
+ZExporter chạy trên từng máy được quản lý. Cứ vài giây nó đo máy một lần và báo số liệu về **BoxServer** qua gRPC.
 Zin, web console, hiển thị những gì BoxServer đã lưu.
 
 ```text
-BoxAgent (mỗi máy) ──gRPC, chỉ gọi ra ngoài──► BoxServer ◄──HTTPS── Zin (trình duyệt)
+ZExporter (mỗi máy) ──gRPC, chỉ gọi ra ngoài──► BoxServer ◄──HTTPS── Zin (trình duyệt)
 ```
 
 Agent chỉ gọi ra (dial-out). Máy không cần public IP, không cần mở inbound port, không cần VPN; chỉ cần đường tới cổng
@@ -72,8 +72,8 @@ lịch sử và alias sau khi khởi động lại hay đổi hostname.
 
 | Hệ điều hành | File |
 |---|---|
-| Linux, macOS | `/var/lib/boxagent/id` |
-| Windows | `%ProgramData%\BoxAgent\id` |
+| Linux, macOS | `/var/lib/zexporter/id` |
+| Windows | `%ProgramData%\ZExporter\id` |
 
 - File được tạo với quyền 0600 và chỉ chứa UUID.
 - File chứa nội dung khác thì agent dừng và báo lỗi, không tự ghi đè, vì ID mới sẽ hiện thành một thiết bị mới.
@@ -135,9 +135,9 @@ một release `v0.1.<n>` gồm:
 
 | File | Dùng cho |
 |---|---|
-| `boxagent-linux-amd64` | Linux trên Intel hoặc AMD |
-| `boxagent-linux-arm64` | Linux trên ARM (Raspberry Pi, server ARM) |
-| `boxagent-windows-amd64.exe` | Windows |
+| `zexporter-linux-amd64` | Linux trên Intel hoặc AMD |
+| `zexporter-linux-arm64` | Linux trên ARM (Raspberry Pi, server ARM) |
+| `zexporter-windows-amd64.exe` | Windows |
 | `SHA256SUMS` | Checksum của ba file trên |
 
 Chưa có bản cho macOS; xem [macOS](#macos).
@@ -154,29 +154,29 @@ Test-NetConnection 192.168.1.10 -Port 8081   # Windows PowerShell
 **Chạy thử bằng tay** (dừng khi đóng shell):
 
 ```bash
-curl -LO https://github.com/ZinOctopus/exporter/releases/latest/download/boxagent-linux-amd64
+curl -LO https://github.com/ZinOctopus/exporter/releases/latest/download/zexporter-linux-amd64
 curl -LO https://github.com/ZinOctopus/exporter/releases/latest/download/SHA256SUMS
 sha256sum -c SHA256SUMS --ignore-missing      # phải in OK
-chmod +x boxagent-linux-amd64
-sudo ./boxagent-linux-amd64 --server 192.168.1.10:8081
+chmod +x zexporter-linux-amd64
+sudo ./zexporter-linux-amd64 --server 192.168.1.10:8081
 ```
 
-Trên máy ARM, tải `boxagent-linux-arm64` thay cho bản amd64.
+Trên máy ARM, tải `zexporter-linux-arm64` thay cho bản amd64.
 
 **Chạy như service** (tự chạy khi khởi động máy, tự chạy lại khi agent dừng) bằng systemd. Cần quyền root. Đổi
 `192.168.1.10:8081` thành địa chỉ gRPC của BoxServer:
 
 ```bash
-sudo install -m 0755 boxagent-linux-amd64 /usr/local/bin/boxagent
+sudo install -m 0755 zexporter-linux-amd64 /usr/local/bin/zexporter
 
-sudo tee /etc/systemd/system/boxagent.service >/dev/null <<'EOF'
+sudo tee /etc/systemd/system/zexporter.service >/dev/null <<'EOF'
 [Unit]
-Description=BoxAgent
+Description=ZExporter
 After=network-online.target
 Wants=network-online.target
 
 [Service]
-ExecStart=/usr/local/bin/boxagent --server 192.168.1.10:8081
+ExecStart=/usr/local/bin/zexporter --server 192.168.1.10:8081
 Restart=always
 
 [Install]
@@ -184,16 +184,16 @@ WantedBy=multi-user.target
 EOF
 
 sudo systemctl daemon-reload
-sudo systemctl enable --now boxagent
+sudo systemctl enable --now zexporter
 ```
 
 | Việc | Lệnh |
 |---|---|
-| Xem trạng thái | `systemctl status boxagent` |
-| Xem log (dòng khởi động và lỗi; mẫu đi thẳng về server) | `journalctl -u boxagent -f` |
-| Đổi server | Sửa `--server` trong `/etc/systemd/system/boxagent.service`, rồi `sudo systemctl daemon-reload && sudo systemctl restart boxagent` |
-| Nâng cấp | Chép binary mới đè `/usr/local/bin/boxagent`, rồi `sudo systemctl restart boxagent` |
-| Gỡ | `sudo systemctl disable --now boxagent && sudo rm /etc/systemd/system/boxagent.service /usr/local/bin/boxagent && sudo systemctl daemon-reload` |
+| Xem trạng thái | `systemctl status zexporter` |
+| Xem log (dòng khởi động và lỗi; mẫu đi thẳng về server) | `journalctl -u zexporter -f` |
+| Đổi server | Sửa `--server` trong `/etc/systemd/system/zexporter.service`, rồi `sudo systemctl daemon-reload && sudo systemctl restart zexporter` |
+| Nâng cấp | Chép binary mới đè `/usr/local/bin/zexporter`, rồi `sudo systemctl restart zexporter` |
+| Gỡ | `sudo systemctl disable --now zexporter && sudo rm /etc/systemd/system/zexporter.service /usr/local/bin/zexporter && sudo systemctl daemon-reload` |
 
 Service chạy bằng root nên đọc được mọi tiến trình. Hệ không có systemd (ví dụ Alpine dùng OpenRC) cần tự viết file
 service; trong lúc đó hãy chạy binary bằng tay.
@@ -203,16 +203,16 @@ service; trong lúc đó hãy chạy binary bằng tay.
 Mở PowerShell **bằng quyền Administrator** (agent ghi file ID vào `C:\ProgramData`):
 
 ```powershell
-mkdir C:\BoxAgent
-Invoke-WebRequest https://github.com/ZinOctopus/exporter/releases/latest/download/boxagent-windows-amd64.exe -OutFile C:\BoxAgent\boxagent.exe
-C:\BoxAgent\boxagent.exe --server 192.168.1.10:8081
+mkdir C:\ZExporter
+Invoke-WebRequest https://github.com/ZinOctopus/exporter/releases/latest/download/zexporter-windows-amd64.exe -OutFile C:\ZExporter\zexporter.exe
+C:\ZExporter\zexporter.exe --server 192.168.1.10:8081
 ```
 
 Chưa có trình cài đặt hay Windows service, nên đóng cửa sổ là agent dừng. Trong lúc chờ, có thể dùng scheduled task để
 chạy khi khởi động máy (dự án chưa kiểm chứng cách này):
 
 ```powershell
-schtasks /Create /TN BoxAgent /SC ONSTART /RU SYSTEM /RL HIGHEST /TR "C:\BoxAgent\boxagent.exe --server 192.168.1.10:8081"
+schtasks /Create /TN ZExporter /SC ONSTART /RU SYSTEM /RL HIGHEST /TR "C:\ZExporter\zexporter.exe --server 192.168.1.10:8081"
 ```
 
 Windows Defender Firewall không cần rule inbound, vì agent chỉ kết nối ra ngoài.
@@ -223,9 +223,9 @@ Chưa phát hành bản cho macOS. Mã nguồn đã xử lý macOS (OS được 
 build bằng [Go](https://go.dev/dl/) 1.27.3 trở lên:
 
 ```bash
-git clone https://github.com/ZinOctopus/exporter.git && cd BoxAgent
-GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -o boxagent ./cmd/boxagent   # Apple silicon; đổi amd64 cho Intel
-sudo ./boxagent --server 192.168.1.10:8081
+git clone https://github.com/ZinOctopus/exporter.git && cd ZExporter
+GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -o zexporter ./cmd/zexporter   # Apple silicon; đổi amd64 cho Intel
+sudo ./zexporter --server 192.168.1.10:8081
 ```
 
 Chưa có service launchd.
@@ -236,10 +236,10 @@ Chưa có service launchd.
 `192.168.56.11` đến `.13`. Chúng tới BoxServer đang chạy trên máy host ở `192.168.56.1:8081`.
 
 ```bash
-make build                       # binary Linux tĩnh ở dist/boxagent
+make build                       # binary Linux tĩnh ở dist/zexporter
 vagrant up                       # bật các VM
 make deploy                      # chạy hoặc cập nhật agent trên mọi VM đang chạy
-vagrant ssh debian-1 -c "tail -n1 /var/log/boxagent.log"
+vagrant ssh debian-1 -c "tail -n1 /var/log/zexporter.log"
 ```
 
 Đặt `BOXSERVER=host:port` để trỏ sang server khác, `DISTROS=debian,ubuntu` để chọn bản phân phối, và `N=2` để mỗi loại
@@ -252,10 +252,10 @@ Cần Go 1.27.3 trở lên.
 | Lệnh | Tác dụng |
 |---|---|
 | `make test` | Chạy unit test, kèm một test lấy mẫu chính máy đang chạy |
-| `make build` | Binary Linux amd64 tĩnh ở `dist/boxagent`, phiên bản `0.1.<số commit>` |
+| `make build` | Binary Linux amd64 tĩnh ở `dist/zexporter`, phiên bản `0.1.<số commit>` |
 | `make proto` | Sinh lại `internal/pb` sau khi sửa proto (cần `protoc`, `protoc-gen-go`, `protoc-gen-go-grpc`) |
 | `make deploy` | Build rồi chạy hoặc cập nhật agent trên mọi VM thử đang chạy |
 
-Nền tảng khác: `GOOS=windows GOARCH=amd64 go build -ldflags "-s -w -X main.version=0.1.99" -o boxagent.exe ./cmd/boxagent`.
+Nền tảng khác: `GOOS=windows GOARCH=amd64 go build -ldflags "-s -w -X main.version=0.1.99" -o zexporter.exe ./cmd/zexporter`.
 Thiếu cờ `-X main.version=…` thì agent báo phiên bản `0.0.0`.
 

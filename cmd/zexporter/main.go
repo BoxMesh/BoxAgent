@@ -32,6 +32,9 @@ func main() {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			if isService, err := runService(func(ctx context.Context) error { return run(ctx, server, interval) }); isService || err != nil {
+				return err
+			}
 			return run(cmd.Context(), server, interval)
 		},
 	}

@@ -208,12 +208,20 @@ Invoke-WebRequest https://github.com/ZinOctopus/exporter/releases/latest/downloa
 C:\ZExporter\zexporter.exe --server 192.168.1.10:8081
 ```
 
-Chưa có trình cài đặt hay Windows service, nên đóng cửa sổ là agent dừng. Trong lúc chờ, có thể dùng scheduled task để
-chạy khi khởi động máy (dự án chưa kiểm chứng cách này):
+**Chạy như Windows service** (tự chạy khi khởi động máy, tự chạy lại khi agent lỗi). Vẫn trong PowerShell Administrator;
+đổi địa chỉ `--server` cho đúng. Cần `sc.exe`, không phải `sc` (trong PowerShell `sc` là `Set-Content`):
 
 ```powershell
-schtasks /Create /TN ZExporter /SC ONSTART /RU SYSTEM /RL HIGHEST /TR "C:\ZExporter\zexporter.exe --server 192.168.1.10:8081"
+sc.exe create ZExporter binPath= "C:\ZExporter\zexporter.exe --server 192.168.1.10:8081" start= auto DisplayName= "ZExporter"
+sc.exe failure ZExporter reset= 86400 actions= restart/5000/restart/5000/restart/5000
+sc.exe failureflag ZExporter 1
+sc.exe start ZExporter
 ```
+
+Service chạy bằng tài khoản `LocalSystem`, nên đọc được mọi tiến trình. Dừng và gỡ:
+`sc.exe stop ZExporter; sc.exe delete ZExporter`. Đổi server: `sc.exe config ZExporter binPath= "..."` rồi `sc.exe stop ZExporter; sc.exe start ZExporter`.
+Chạy `zexporter.exe` bằng tay ở cửa sổ PowerShell vẫn hoạt động như trước. Log của service không được lưu ở đâu cả; khi cần
+gỡ lỗi, hãy chạy bằng tay.
 
 Windows Defender Firewall không cần rule inbound, vì agent chỉ kết nối ra ngoài.
 

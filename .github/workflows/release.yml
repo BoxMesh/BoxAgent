@@ -31,12 +31,11 @@ jobs:
           go-version-file: go.mod
       - name: Build
         run: |
-          for target in linux/amd64 linux/arm64 windows/amd64; do
-            os=${target%/*}; arch=${target#*/}; ext=""
-            [ "$os" = windows ] && ext=.exe
+          for target in linux/amd64 linux/arm64; do
+            os=${target%/*}; arch=${target#*/}
             GOOS=$os GOARCH=$arch CGO_ENABLED=0 go build -trimpath \
               -ldflags "-s -w -X main.version=$VERSION" \
-              -o "dist/zexporter-$os-$arch$ext" ./cmd/zexporter
+              -o "dist/zexporter-$os-$arch" ./cmd/zexporter
           done
           cd dist && sha256sum * > SHA256SUMS
       - name: Publish
@@ -44,7 +43,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh release create "v$VERSION" dist/* --target "$GITHUB_SHA" --title "ZExporter v$VERSION" --generate-notes
 
-  # Windows setup wizard (installs the service, asks for the server address). Inno Setup only runs on Windows.
+  # The Windows download: a setup wizard (installs the service, asks for the server address), published as zexporter-windows.exe. Inno Setup only runs on Windows.
   installer:
     needs: release
     runs-on: windows-latest
@@ -65,4 +64,4 @@ jobs:
       - name: Upload to the release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "v$env:VERSION" dist/zexporter-setup.exe --clobber
+        run: gh release upload "v$env:VERSION" dist/zexporter-windows.exe --clobber

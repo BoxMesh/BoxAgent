@@ -1,6 +1,6 @@
 ; Inno Setup script: installs ZExporter as a Windows service and asks for the BoxServer gRPC address.
 ; Run the installer again to repair or to change the address: the box is pre-filled with the saved one.
-; Silent: zexporter-setup.exe /VERYSILENT /SERVER=host:port
+; Silent: zexporter-windows.exe /VERYSILENT /SERVER=host:port
 ; Build: ISCC.exe installer\zexporter.iss  (expects dist\zexporter-windows-amd64.exe; VERSION env var sets the version)
 
 #define Version GetEnv("VERSION")
@@ -20,7 +20,7 @@ PrivilegesRequired=admin
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 OutputDir=..\dist
-OutputBaseFilename=zexporter-setup
+OutputBaseFilename=zexporter-windows
 Compression=lzma2
 SolidCompression=yes
 UninstallDisplayName=ZExporter

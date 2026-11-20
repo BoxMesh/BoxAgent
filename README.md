@@ -137,8 +137,8 @@ một release `v0.1.<n>` gồm:
 |---|---|
 | `zexporter-linux-amd64` | Linux trên Intel hoặc AMD |
 | `zexporter-linux-arm64` | Linux trên ARM (Raspberry Pi, server ARM) |
-| `zexporter-windows-amd64.exe` | Windows |
-| `SHA256SUMS` | Checksum của ba file trên |
+| `zexporter-windows.exe` | Windows (trình cài đặt, xem mục Windows) |
+| `SHA256SUMS` | Checksum của hai file Linux |
 
 Chưa có bản cho macOS; xem [macOS](#macos).
 
@@ -200,36 +200,14 @@ service; trong lúc đó hãy chạy binary bằng tay.
 
 ### Windows
 
-Mở PowerShell **bằng quyền Administrator** (agent ghi file ID vào `C:\ProgramData`):
+Tải `zexporter-windows.exe` ở trang Releases và chạy (cần quyền Administrator). Đây là trình cài đặt: nhập địa chỉ
+`host:port` của server, nó chép agent vào `C:\Program Files\ZExporter`, tạo service `ZExporter` (tự chạy khi khởi động máy, tự
+chạy lại khi lỗi) và khởi động nó. Service chạy bằng `LocalSystem`, nên đọc được mọi tiến trình.
 
-```powershell
-mkdir C:\ZExporter
-Invoke-WebRequest https://github.com/ZinOctopus/exporter/releases/latest/download/zexporter-windows-amd64.exe -OutFile C:\ZExporter\zexporter.exe
-C:\ZExporter\zexporter.exe --server 192.168.1.10:8081
-```
-
-**Cài bằng trình cài đặt (dễ nhất).** Tải `zexporter-setup.exe` ở trang Releases, chạy (cần quyền Administrator), nhập địa chỉ
-`host:port` của server. Trình cài đặt chép agent vào `C:\Program Files\ZExporter`, tạo service `ZExporter` và khởi động nó.
-Muốn đổi địa chỉ hoặc sửa lỗi cài đặt, chạy lại chính file đó: ô địa chỉ được điền sẵn giá trị cũ. Cài im lặng:
-`zexporter-setup.exe /VERYSILENT /SERVER=host:port`. Gỡ trong Settings → Apps. Mã ID thiết bị ở `C:\ProgramData\ZExporter`
-được giữ lại, nên cài lại vẫn là thiết bị cũ.
-
-Hoặc cài tay bằng `sc.exe`:
-
-**Chạy như Windows service** (tự chạy khi khởi động máy, tự chạy lại khi agent lỗi). Vẫn trong PowerShell Administrator;
-đổi địa chỉ `--server` cho đúng. Cần `sc.exe`, không phải `sc` (trong PowerShell `sc` là `Set-Content`):
-
-```powershell
-sc.exe create ZExporter binPath= "C:\ZExporter\zexporter.exe --server 192.168.1.10:8081" start= auto DisplayName= "ZExporter"
-sc.exe failure ZExporter reset= 86400 actions= restart/5000/restart/5000/restart/5000
-sc.exe failureflag ZExporter 1
-sc.exe start ZExporter
-```
-
-Service chạy bằng tài khoản `LocalSystem`, nên đọc được mọi tiến trình. Dừng và gỡ:
-`sc.exe stop ZExporter; sc.exe delete ZExporter`. Đổi server: `sc.exe config ZExporter binPath= "..."` rồi `sc.exe stop ZExporter; sc.exe start ZExporter`.
-Chạy `zexporter.exe` bằng tay ở cửa sổ PowerShell vẫn hoạt động như trước. Log của service không được lưu ở đâu cả; khi cần
-gỡ lỗi, hãy chạy bằng tay.
+- **Đổi địa chỉ hoặc sửa lỗi cài đặt:** chạy lại chính file đó, ô địa chỉ được điền sẵn giá trị cũ.
+- **Cài im lặng:** `zexporter-windows.exe /VERYSILENT /SERVER=host:port`.
+- **Gỡ:** Settings → Apps. Mã ID thiết bị ở `C:\ProgramData\ZExporter` được giữ lại, nên cài lại vẫn là thiết bị cũ.
+- Log của service không được lưu ở đâu cả; khi cần gỡ lỗi, build và chạy bằng tay (xem mục build).
 
 Windows Defender Firewall không cần rule inbound, vì agent chỉ kết nối ra ngoài.
 

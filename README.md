@@ -151,6 +151,18 @@ Test-NetConnection 192.168.1.10 -Port 8081   # Windows PowerShell
 
 ### Linux
 
+**Cài bằng script (Ubuntu, Debian và các bản có systemd).** Script tự chọn bản amd64 hoặc arm64, kiểm tra checksum, cài
+binary vào `/usr/local/bin/zexporter`, tạo service `zexporter` (tự chạy khi khởi động máy, tự chạy lại khi lỗi) và khởi động nó:
+
+```bash
+curl -fsSL https://github.com/ZinOctopus/exporter/releases/latest/download/install.sh | sudo sh -s -- --server 192.168.1.10:8081
+```
+
+Chạy lại đúng lệnh đó để nâng cấp hoặc đổi server (không truyền `--server` thì dùng lại địa chỉ đã lưu). Gỡ:
+`curl -fsSL https://github.com/ZinOctopus/exporter/releases/latest/download/install.sh | sudo sh -s -- --uninstall`.
+Mã ID thiết bị ở `/var/lib/zexporter` được giữ lại. Phần dưới là cách làm tay, dùng khi máy không có systemd hoặc không
+muốn chạy script.
+
 **Chạy thử bằng tay** (dừng khi đóng shell):
 
 ```bash

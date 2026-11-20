@@ -37,6 +37,7 @@ jobs:
               -ldflags "-s -w -X main.version=$VERSION" \
               -o "dist/zexporter-$os-$arch" ./cmd/zexporter
           done
+          cp install.sh dist/
           cd dist && sha256sum * > SHA256SUMS
       - name: Publish
         env:

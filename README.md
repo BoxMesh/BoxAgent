@@ -55,6 +55,7 @@ Agent luôn gửi **toàn bộ** tiến trình đang chạy, không giới hạn
 | Trường | Ghi chú |
 |---|---|
 | PID, tên, người dùng | |
+| PPID | PID của tiến trình cha, `0` khi không có hoặc không đọc được. Console dùng nó để gom các tiến trình cùng tên thành một dòng ứng dụng |
 | Trạng thái | `running`, `suspended` hoặc `not-responding` (zombie) |
 | CPU | Phần trăm của **cả máy** (tiến trình dùng hết một nhân trên máy 4 nhân thì ra 25) |
 | Bộ nhớ | Bộ nhớ resident (RSS) tính bằng MB |
@@ -112,7 +113,7 @@ rồi bỏ; mẫu sau thử lại, và gRPC tự nối lại. Việc lấy mẫu
 | `agent_version` | string | |
 | `cpu_usage`, `ram_usage`, `disk_usage` | double | Phần trăm |
 | `net_in`, `net_out` | double | Mbps |
-| `processes` | repeated | `pid`, `name`, `user`, `status`, `cpu` (%), `memory_mb` |
+| `processes` | repeated | `pid`, `name`, `user`, `status`, `cpu` (%), `memory_mb`, `ppid` |
 
 Định nghĩa nằm ở [proto/device.proto](proto/device.proto). File này phải giống hệt
 `OctopusServer/src/Zin.API/Protos/Device.proto`; sửa thì sửa cả hai, rồi chạy `make proto`.

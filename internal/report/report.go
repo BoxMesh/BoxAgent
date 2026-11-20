@@ -45,7 +45,7 @@ func (c *Client) Send(ctx context.Context, s *metrics.Snapshot) error {
 func request(id string, s *metrics.Snapshot, ip, mac string) *pb.DeviceRequest {
 	procs := make([]*pb.DeviceProcess, len(s.Processes))
 	for i, p := range s.Processes {
-		procs[i] = &pb.DeviceProcess{Pid: p.PID, Name: p.Name, User: p.User, Status: p.Status, Cpu: p.CPU, MemoryMb: p.MemoryMB}
+		procs[i] = &pb.DeviceProcess{Pid: p.PID, Name: p.Name, User: p.User, Status: p.Status, Cpu: p.CPU, MemoryMb: p.MemoryMB, Ppid: p.PPID}
 	}
 	return &pb.DeviceRequest{
 		Processes:      procs,

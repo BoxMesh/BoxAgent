@@ -44,4 +44,5 @@ type Process struct {
 	Status   string  `json:"status"`
 	CPU      float64 `json:"cpu"` // percent of the whole machine
 	MemoryMB float64 `json:"memoryMb"`
+	PPID     int32   `json:"ppid"` // parent process; 0 when unknown
 }

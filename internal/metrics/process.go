@@ -37,9 +37,10 @@ func (c *Collector) processes(ctx context.Context) []Process {
 		if mi, err := p.MemoryInfoWithContext(ctx); err == nil {
 			memMB = float64(mi.RSS) / (1 << 20)
 		}
+		ppid, _ := p.PpidWithContext(ctx)
 		list = append(list, Process{
 			PID: pid, Name: name, User: user, Status: processStatus(status),
-			CPU: round2(pct / cores), MemoryMB: round2(memMB),
+			CPU: round2(pct / cores), MemoryMB: round2(memMB), PPID: ppid,
 		})
 	}
 	c.procs = alive

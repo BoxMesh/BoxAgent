@@ -208,6 +208,14 @@ Invoke-WebRequest https://github.com/ZinOctopus/exporter/releases/latest/downloa
 C:\ZExporter\zexporter.exe --server 192.168.1.10:8081
 ```
 
+**Cài bằng trình cài đặt (dễ nhất).** Tải `zexporter-setup.exe` ở trang Releases, chạy (cần quyền Administrator), nhập địa chỉ
+`host:port` của server. Trình cài đặt chép agent vào `C:\Program Files\ZExporter`, tạo service `ZExporter` và khởi động nó.
+Muốn đổi địa chỉ hoặc sửa lỗi cài đặt, chạy lại chính file đó: ô địa chỉ được điền sẵn giá trị cũ. Cài im lặng:
+`zexporter-setup.exe /VERYSILENT /SERVER=host:port`. Gỡ trong Settings → Apps. Mã ID thiết bị ở `C:\ProgramData\ZExporter`
+được giữ lại, nên cài lại vẫn là thiết bị cũ.
+
+Hoặc cài tay bằng `sc.exe`:
+
 **Chạy như Windows service** (tự chạy khi khởi động máy, tự chạy lại khi agent lỗi). Vẫn trong PowerShell Administrator;
 đổi địa chỉ `--server` cho đúng. Cần `sc.exe`, không phải `sc` (trong PowerShell `sc` là `Set-Content`):
 
